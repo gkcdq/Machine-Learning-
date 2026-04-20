@@ -1,24 +1,29 @@
-console.log("ref ok ?", gridRef.current);
+import { CellType } from "../map/cell";
+import { MapData } from "./agent";
 
-const map = gridRef.current!.getMap();
+export function parseMap(map: CellType[][]): MapData {
+  const rows = map.length;
+  const cols = map[0]?.length ?? 0;
 
- console.log("map:", map);
+  let start: [number, number] | null = null;
+  let exit: [number, number] | null = null;
+  const collectibles: [number, number][] = [];
+  const walls: [number, number][] = [];
+  let iaposeX = 0;
+  let iaposeY = 0;
+  let spawnX = 0;
+  let spawnY = 0;
 
-const rows = map.length;
-const cols = map[0].length;
-
-let start: [number, number] | null = null;
-let exit: [number, number] | null = null;
-const collectibles: [number, number][] = [];
-const walls: [number, number][] = [];
-
-for (let r = 0; r < rows; r++)
-{
-    for (let c = 0; c < cols; c++)
+  for (let r = 0; r < rows; r++)
     {
-        if (map[r][c] === 'start') start = [r, c];
-        if (map[r][c] === 'exit') exit = [r, c];
-        if (map[r][c] === 'collectible') collectibles.push([r, c]);
-        if (map[r][c] === 'wall') walls.push([r, c]);
+        for (let c = 0; c < cols; c++)
+        {
+            const cell = map[r][c];
+            if (cell === "start"){ start = [r, c]; iaposeX = r; iaposeY = c;} 
+            else if (cell === "exit") exit = [r, c];
+            else if (cell === "collectible") collectibles.push([r, c]);
+            else if (cell === "wall") walls.push([r, c]);
+        }
     }
+  return { start, exit, collectibles, walls, rows, cols, iaposeX, iaposeY};
 }

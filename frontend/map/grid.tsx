@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
 import { Cell, CellType } from "./cell";
+import { stopRandomMovement, qTable } from "../IA/agent";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,6 +23,8 @@ export interface GridHandle {
   getMap: () => CellType[][];
   getSize: () => { rows: number; cols: number };
   triggerStartStop: () => void;
+  consumeCell: (row: number, col: number) => void;
+  restoreCell: (row: number, col: number, type: CellType) => void;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -80,7 +83,7 @@ function validateMap(cells: CellType[][]): string | null {
 
   const reachable = bfsReachable(cells, start);
   if (!reachable.has(`${exit.row},${exit.col}`))
-    return "⛔  La sortie est isolée par des murs — le départ ne peut pas l'atteindre !";
+    return "⛔  La sortie ou le depart est isolée par des murs !";
 
   return null;
 }
@@ -109,13 +112,27 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
 
     useImperativeHandle(ref, () => ({
         moveAgent(row: number, col: number) { setAgentPos({row, col}) },
-        stopAgent() { isRunning == false },
+        stopAgent() { isRunning == false; stopRandomMovement() },
         getMap() { return frozenMap.current ?? grid.cells; },
         getSize() { return { rows: grid.rows, cols: grid.cols }; },
         
         // Ajoute cette fonction ici :
-        triggerStartStop() {
-        handleStartStop(); // Appelle la fonction interne qui gère déjà tout
+        triggerStartStop() { handleStartStop(); },
+        consumeCell(row: number, col: number) {
+          setGrid((prev) => {
+            const next = prev.cells.map((r) => [...r]);
+            next[row][col] = "empty";
+            return { ...prev, cells: next };
+          });
+          if (frozenMap.current) frozenMap.current[row][col] = "empty";
+        },
+        restoreCell(row: number, col: number, type: CellType) {
+          setGrid((prev) => {
+            const next = prev.cells.map((r) => [...r]);
+            next[row][col] = type;
+            return { ...prev, cells: next };
+          });
+          if (frozenMap.current) frozenMap.current[row][col] = type;
         },
     }));
 
@@ -171,6 +188,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
       setIsRunning(false);
       setAgentPos(null);
       frozenMap.current = null;
+      stopRandomMovement();
       setStatusMsg("Simulation arrêtée.");
       return;
     }
@@ -185,7 +203,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
     frozenMap.current = grid.cells.map((r) => [...r]);
     setAgentPos(startPos);
     setIsRunning(true);
-    setStatusMsg("Agent initialisé — en attente de ton IA…");
+    setStatusMsg("Agent initialisé, MLP en cours");
     if (onStart) onStart();
   };
 
@@ -201,19 +219,41 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
     grid.cells.flat().filter((c) => c === type).length;
 
   const renderCell = (cellType: CellType, r: number, c: number) => {
-    const isAgent = agentPos?.row === r && agentPos?.col === c;
-    return (
-      <Cell
-        key={`${r}-${c}`}
-        type={isAgent ? "agent" : cellType}
-        row={r}
-        col={c}
-        onClick={handleClick}
-        onRightClick={handleRightClick}
-        onMouseEnter={handleMouseEnter}
-      />
-    );
-  };
+      // 1. On cherche toutes les clés qui commencent par "r,c|" 
+      // (ex: "5,10|0", "5,10|1", etc.)
+      const prefix = `${r},${c}|`;
+      const relevantKeys = Object.keys(qTable).filter(key => key.startsWith(prefix));
+
+      // 2. On extrait la valeur maximale absolue parmi toutes ces clés
+      let maxQ = 0;
+      relevantKeys.forEach(key => {
+        const values = qTable[key];
+        if (values) {
+          maxQ = Math.max(maxQ, ...values);
+        }
+      });
+
+      // 3. Normalisation pour la heatmap (on divise par 200 car la sortie vaut 200)
+      const normalizedQ = maxQ > 0 ? Math.min(maxQ / 200, 1) : 0;
+      
+      const isAgent = agentPos?.row === r && agentPos?.col === c;
+
+      return (
+        <Cell
+          key={`${r}-${c}`}
+          type={isAgent ? "agent" : cellType}
+          row={r}
+          col={c}
+          qValue={normalizedQ}
+          onClick={handleClick}
+          onRightClick={handleRightClick}
+          onMouseEnter={handleMouseEnter}
+        />
+      );
+    };
+
+  // heat map
+  
 
   // ─── JSX ──────────────────────────────────────────────────────────────────
 
@@ -346,7 +386,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
 
         <div className="map-header">
           <div className="map-title">PATHFINDING IA</div>
-          <div className="map-subtitle">// REINFORCEMENT LEARNING — PATHFINDING DEMO</div>
+          <div className="map-subtitle">// MACHINE LEARNING && PATHFINDING</div>
         </div>
 
         <div className="toolbar">
@@ -400,15 +440,15 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
         </div>
 
         <div className="actions">
-          <button className="action-btn action-btn--clear" onClick={clearGrid} disabled={isRunning}>
-            EFFACER TOUT
-          </button>
           <button
             className={`action-btn action-btn--start${isRunning ? " running" : ""}`}
             onClick={handleStartStop}
           >
             <span className={`robot-icon${isRunning ? " active" : ""}`}>🤖</span>
             {isRunning ? "STOP" : "START"}
+          </button>
+          <button className="action-btn action-btn--clear" onClick={clearGrid} disabled={isRunning}>
+            EFFACER TOUT
           </button>
         </div>
 

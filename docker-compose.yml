@@ -46,7 +46,7 @@ services:
     build: ./nginx
     container_name: nginx
     ports:
-      - "443:443"
+      - "8443:443"
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
     depends_on:

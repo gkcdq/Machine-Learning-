@@ -1,51 +1,52 @@
-# Nom de ton projet (Modifie-le ici)
-NAME = ML
+# --- CONFIGURATION ---
+NAME     = ML
+# Cette ligne permet d'utiliser 'docker' par défaut, 
+# mais de passer sur 'podman' via la commande : make DOCKER=podman
+DOCKER   ?= docker
 
-# Couleurs
-CYAN  = \033[0;36m
-GREEN = \033[0;32m
-RED   = \033[0;31m
-RESET = \033[0m
+# --- COULEURS ---
+CYAN     = \033[0;36m
+GREEN    = \033[0;32m
+RED      = \033[0;31m
+RESET    = \033[0m
 
 # --- COMMANDES DOCKER ---
 
 all: up
 
-# Build et lancement
+# Build et lancement (Utilise 'podman compose' ou 'docker compose')
 up:
 	@echo "$(CYAN)Lancement de $(NAME)...$(RESET)"
-	docker compose up --build -d
+	$(DOCKER) compose up --build -d
 
 # Arrêt
 stop:
 	@echo "$(RED)Arrêt des containers...$(RESET)"
-	docker compose stop
+	$(DOCKER) compose stop
 
 # Down
 down:
 	@echo "$(RED)Suppression des containers...$(RESET)"
-	docker compose down
-
-# ... (et ainsi de suite pour toutes les occurrences)
+	$(DOCKER) compose down
 
 # --- DJANGO & DATABASE ---
 
-# Appliquer les migrations Django sans entrer dans le container
+# Appliquer les migrations Django
 migrate:
 	@echo "$(GREEN)Application des migrations Django...$(RESET)"
-	docker exec -it backend python manage.py makemigrations
-	docker exec -it backend python manage.py migrate
+	$(DOCKER) exec -it backend python manage.py makemigrations
+	$(DOCKER) exec -it backend python manage.py migrate
 
 # Créer un superuser Django (admin)
 superuser:
-	docker exec -it backend python manage.py createsuperuser
+	$(DOCKER) exec -it backend python manage.py createsuperuser
 
 # --- NETTOYAGE ---
 
 # Nettoyage complet (Supprime TOUT : images, volumes db, containers)
 fclean:
 	@echo "$(RED)Nettoyage total en cours...$(RESET)"
-	docker compose down -v
+	$(DOCKER) compose down -v
 	rm -rf frontend/node_modules
 	rm -rf backend/__pycache__
 
@@ -54,9 +55,9 @@ re: fclean all
 # --- DEBUG ---
 
 logs:
-	docker-compose logs -f
+	$(DOCKER) compose logs -f
 
 ps:
-	docker-compose ps
+	$(DOCKER) compose ps
 
-.PHONY: all up stop down migrate superuser fclean re logs ps
+.PHONY: all up stop down migrate superuser fclean re logs ps 

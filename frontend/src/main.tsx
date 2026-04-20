@@ -3,7 +3,7 @@ import React, { useRef } from 'react'
 import ReactDOM from 'react-dom/client'
 import Grid, { GridHandle } from '../map/grid' //
 ///////////////////////////////////////////////////////////////////////
-import { deplacerRobot } from '../IA/agent';
+import { runAgent } from '../IA/agent';
 ///////////////////////////////////////////////////////////////////////
 const App = () => {
   const gridRef = useRef<GridHandle>(null); //
@@ -12,7 +12,7 @@ const App = () => {
   const handleStartIA = () => {
     if (gridRef.current) {
       const map = gridRef.current.getMap(); //
-      deplacerRobot(gridRef);
+      runAgent(gridRef);
       
       // Ici, envoyer la 'map' à backend Django
     }
