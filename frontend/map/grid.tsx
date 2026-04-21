@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
 import { Cell, CellType } from "./cell";
-import { stopRandomMovement, qTable } from "../IA/agent";
+import { stopRandomMovement, qTableA, qTableB } from "../IA/agent";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -219,22 +219,26 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
     grid.cells.flat().filter((c) => c === type).length;
 
   const renderCell = (cellType: CellType, r: number, c: number) => {
-      // 1. On cherche toutes les clés qui commencent par "r,c|" 
-      // (ex: "5,10|0", "5,10|1", etc.)
-      const prefix = `${r},${c}|`;
-      const relevantKeys = Object.keys(qTable).filter(key => key.startsWith(prefix));
+      // 1. On définit le préfixe de la clé pour cette cellule (ex: "5,3|")
+      const cellPrefix = `${r},${c}|`;
 
-      // 2. On extrait la valeur maximale absolue parmi toutes ces clés
+      // 2. On récupère toutes les clés qui commencent par ce préfixe dans les deux tables
+      const keysA = Object.keys(qTableA).filter(k => k.startsWith(cellPrefix));
+      const keysB = Object.keys(qTableB).filter(k => k.startsWith(cellPrefix));
+
       let maxQ = 0;
-      relevantKeys.forEach(key => {
-        const values = qTable[key];
-        if (values) {
-          maxQ = Math.max(maxQ, ...values);
-        }
+
+      // 3. On cherche la valeur maximale enregistrée pour cette case, toutes phases confondues
+      keysA.forEach(k => {
+        maxQ = Math.max(maxQ, ...qTableA[k]);
+      });
+      keysB.forEach(k => {
+        maxQ = Math.max(maxQ, ...qTableB[k]);
       });
 
-      // 3. Normalisation pour la heatmap (on divise par 200 car la sortie vaut 200)
-      const normalizedQ = maxQ > 0 ? Math.min(maxQ / 200, 1) : 0;
+      // 4. Normalisation pour l'affichage (ajuste le diviseur 1000 selon tes récompenses)
+      // Comme ta victoire est à 1000, on divise par 1000 pour avoir un ratio entre 0 et 1
+      const normalizedQ = maxQ > 0 ? Math.min(maxQ / 1000, 1) : 0;
       
       const isAgent = agentPos?.row === r && agentPos?.col === c;
 
@@ -244,7 +248,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
           type={isAgent ? "agent" : cellType}
           row={r}
           col={c}
-          qValue={normalizedQ}
+          qValue={normalizedQ} // La heatmap utilisera cette valeur
           onClick={handleClick}
           onRightClick={handleRightClick}
           onMouseEnter={handleMouseEnter}
