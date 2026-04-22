@@ -127,7 +127,7 @@ make
 The agent operates within a continuous feedback loop, learning to map environmental states to optimal actions.
 
 <p align="center">
-  <img src="https://media.discordapp.net/attachments/1484976360974713054/1496366969014714519/Untitled.png?ex=69e99fd6&is=69e84e56&hm=d0c9239d50a380db089f7eeab23db040d7e024c258c118b23b3865688d927dbc&=&format=webp&quality=lossless" width="600" alt="Reinforcement Learning Loop">
+  <img src="https://media.discordapp.net/attachments/1484976360974713054/1496368286567239690/RLP.png?ex=69e9a110&is=69e84f90&hm=74637000baca2e71105c826eaeeecf17883a5dc7ebe0d3a78169b812220dab7c&=&format=webp&quality=lossless&width=1180&height=891" width="600" alt="Reinforcement Learning Loop">
 </p>
 
 ### How it works in RLP:
