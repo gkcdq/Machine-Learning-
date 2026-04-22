@@ -1,3 +1,7 @@
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
 # RLP
 
 _This project has been created as a personal project_
@@ -109,11 +113,11 @@ make
 
 ```text
 ├── frontend
-│   ├── IA           # RL Logic: Agent, Experience Replay, Q-Learning
-│   ├── map          # Grid components, Cell rendering, Map logic
-│   ├── src          # React entry point
-│   └── structure    # Dockerfile for frontend build
-├── nginx            # Reverse proxy & static serving configuration
-├── Makefile         # Automation for build and cleanup
-└── docker-compose.yml
+│   ├── IA              # RL Logic: Agent, Experience Replay, Q-Learning
+│   ├── map             # Grid components, Cell rendering, Map logic
+│   ├── src             # React entry point
+│   └── structure       # Dockerfile for frontend build
+├── nginx               # Reverse proxy & static serving configuration
+├── Makefile            # Automation for build and cleanup
+└── docker-compose.yml  # Communication between Dockers 'Frontend' and 'Nginx'
 ```
