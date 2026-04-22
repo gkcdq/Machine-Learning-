@@ -84,8 +84,8 @@ The AI does not simply walk at random; it utilizes graph theory algorithms to as
 
 - Create a .env file at the root of the project:
 ```
-#Database:
-POSTGRES_DB=postgres_name
+# Nginx / Domain
+DOMAIN_NAME=example
 
 - Clone the repository:
 ```Bash
