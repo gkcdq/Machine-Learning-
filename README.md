@@ -127,7 +127,7 @@ make
 The agent operates within a continuous feedback loop, learning to map environmental states to optimal actions.
 
 <p align="center">
-  <img src="path/to/your/image_28d4bf.png" width="600" alt="Reinforcement Learning Loop">
+  <img src="blob:https://gemini.google.com/619253f4-fecb-4dd4-b213-e5e1d6adec79" width="600" alt="Reinforcement Learning Loop">
 </p>
 
 ### How it works in RLP:
