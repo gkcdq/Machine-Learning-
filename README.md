@@ -29,7 +29,7 @@ Pour éviter la surestimation des valeurs de récompense, le projet utilise deux
 
 ### Formule utilisée :
 ```bash
-Qtarget​=R+γ⋅Qeval​(s′,argmax Qupdate​(s′,a′))
+Qtarget​ = R + γ ⋅ Qeval​(s′,argmax Qupdate​(s′,a′))
 ```
 
 2. Experience Replay (Mémoire)
