@@ -76,7 +76,7 @@ git clone https://github.com/your-username/rlp.git
 ```Bash
 docker-compose up --build
 ```
-- Access: Go to http://localhost:5173.
+- Access: Go to http://localhost:8080.
 
 ### 🕹️ How to use?
 
