@@ -21,11 +21,11 @@ RLP is an experimental visualization platform for Reinforcement Learning integra
 The agent learns through trial and error. It receives rewards (positive or negative) based on its actions.
 1. Double Q-Learning
 
-To prevent the overestimation of reward values, the project uses two Q-tables (qTableA and qTableB).
+- To prevent the overestimation of reward values, the project uses two Q-tables (qTableA and qTableB).
 
-    The agent chooses an action with one table.
+- The agent chooses an action with one table.
 
-    It updates the value using the second table to evaluate the next state.
+- It updates the value using the second table to evaluate the next state.
 
 Formula used:
 ```bash
