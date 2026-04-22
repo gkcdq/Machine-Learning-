@@ -1,97 +1,93 @@
-### 🤖 RLP : Reinforcement Learning & Pathfinding
+### 🤖 RLP: Reinforcement Learning & Pathfinding
 
-RLP est une plateforme expérimentale de visualisation d'apprentissage par renforcement (Reinforcement Learning) intégrée dans un environnement de grille interactive. L'objectif est d'entraîner un agent à collecter des items et à atteindre une sortie de manière optimale en utilisant des algorithmes d'IA moderne.
+RLP is an experimental visualization platform for Reinforcement Learning integrated into an interactive grid environment. The goal is to train an agent to collect items and reach an exit optimally using modern AI algorithms.
 
-### 🚀 Fonctionnalités
+### 🚀 Features
 
-    Éditeur de Map Dynamique : Dessinez des murs, placez des collectibles et définissez les points de départ/arrivée en temps réel.
+- Dynamic Map Editor: Draw `walls`, place `collectibles`, and define `start` / `exit` points in real-time.
 
-    Visualisation "Heatmap" Double :
+- Double Heatmap Visualization:
 
-        Vert (Q-Values) : Visualise l'instinct de l'IA (ce qu'elle "pense" être le meilleur chemin).
+- __Green__ (Q-Values): Visualizes the AI's "instinct" (what it "thinks" is the best path).
 
-        Rouge (Fréquence) : Visualise l'expérience (les zones les plus explorées).
+- __Red__ (Frequency): Visualizes experience (the most explored areas).
 
-    Moteur d'Apprentissage par Renforcement : Implémentation complète du Double Q-Learning avec mémoire d'expérience.
+- Reinforcement Learning Engine: Full implementation of Double Q-Learning with experience replay memory.
 
-    Pathfinding Hybride : Utilisation du BFS pour le calcul de distance et l'optimisation des récompenses.
+- Hybrid Pathfinding: Uses BFS (Breadth-First Search) for distance calculation and reward optimization.
 
-### 🧠 Concepts d'Apprentissage (RL)
+### 🧠 Learning Concepts (RL)
 
-L'agent apprend par essais et erreurs. Il reçoit des récompenses (positives ou négatives) en fonction de ses actions.
-#### 1. Double Q-Learning
+The agent learns through trial and error. It receives rewards (positive or negative) based on its actions.
+1. Double Q-Learning
 
-Pour éviter la surestimation des valeurs de récompense, le projet utilise deux tables Q (qTableA et qTableB).
+To prevent the overestimation of reward values, the project uses two Q-tables (qTableA and qTableB).
 
-- L'agent choisit une action avec une table.
+    The agent chooses an action with one table.
 
-- Il met à jour la valeur en utilisant la seconde table pour évaluer le prochain état.
+    It updates the value using the second table to evaluate the next state.
 
-#### Formule utilisée :
+Formula used:
 ```bash
-Qtarget​ = R + γ ⋅ Qeval​(s', argmax Qupdate​(s′, a′))
+Qtarget ​= R + γ ⋅ Qeval​(s′ ,argmax Qupdate​(s′ ,a′))
 ```
+2. Experience Replay (Memory)
 
-2. Experience Replay (Mémoire)
+The project stores past transitions in a replayBuffer. At each step, the AI "replays" a sample of 64 past transitions to stabilize its learning and prevent forgetting older paths.
+3. Reward Shaping (Reward Modeling)
 
-Le projet stocke les transitions passées dans un replayBuffer. À chaque étape, l'IA "rejoue" un échantillon de 64 transitions passées pour stabiliser son apprentissage et ne pas oublier les anciens chemins.
-3. Reward Shaping (Modélisation des récompenses)
+The reward system is finely tuned to guide the agent:
 
-Le système de récompense est finement réglé pour guider l'agent :
+    Collection: +300
 
-    Collecte : +300
+    Exit (if ready): +1000
 
-    Sortie (si prêt) : +1000
+    Wall Collision: −15
 
-    Collision Mur : −15
+    Stagnation / Back-and-forth: Progressive penalties to force exploration.
 
-    Stagnation/Aller-retour : Pénalités progressives pour forcer l'exploration.
+### 🛤️ Pathfinding & Optimization
 
-### 🛤️ Pathfinding & Optimisation
+The AI does not simply walk at random; it utilizes graph theory algorithms to assist itself:
 
-L'IA ne se contente pas de marcher au hasard ; elle utilise des algorithmes de théorie des graphes pour s'aider :
+    BFS (Breadth-First Search): Used to pre-calculate real distances between all points of interest (Start, Collectibles, Exit) by ignoring walls.
 
-    BFS (Breadth-First Search) : Utilisé pour pré-calculer les distances réelles entre tous les points d'intérêt (Start, Collectibles, Exit) en ignorant les murs.
+    Nearest-Neighbor TSP: The AI calculates an optimal collection order before starting to structure its learning phases.
 
-    Nearest-Neighbor TSP : L'IA calcule un ordre de collecte optimal avant de démarrer pour structurer ses phases d'apprentissage.
+    Map Validation: An algorithm verifies that the exit and collectibles are not isolated by walls before launching the simulation.
 
-    Validation de Map : Un algorithme vérifie que la sortie et les collectibles ne sont pas isolés par des murs avant de lancer la simulation.
+### 🛠️ Technical Stack
 
-### 🛠️ Stack Technique
+    Frontend: React.js, TypeScript.
 
-    Frontend : React.js, TypeScript.
+    Styling: CSS-in-JS with dynamic CSS variables for the heatmap.
 
-    Styling : CSS-in-JS avec variables CSS dynamiques pour la heatmap.
+    Build Tool: Vite.
 
-    Build Tool : Vite.
-
-    Environnement : Docker & Nginx.
+    Environment: Docker & Nginx.
 
 ### 📖 Installation
 
-    Cloner le dépôt :
+    Clone the repository:
+    Bash
 
-    ```Bash
+    git clone https://github.com/your-username/rlp.git
 
-    git clone https://github.com/ton-pseudo/rlp.git
-    ```
-    Lancer avec Docker :
-
-    ```Bash
+    Launch with Docker:
+    Bash
 
     docker-compose up --build
-    ```
 
-    Accès : Rendez-vous sur http://localhost:5173.
+    Access: Go to http://localhost:5173.
 
-### 🕹️ Comment utiliser ?
+### 🕹️ How to use?
 
-- Dessinez des murs (outil Mur █).
+    Draw walls (Wall tool █).
 
-- Placez des items (◈) et une sortie (⬡).
+    Place items (◈) and an exit (⬡).
 
-- Définissez le départ (◉).
+    Define the start (◉).
 
-- Appuyez sur START : Observez l'IA explorer (Phase exploratoire avec Epsilon-Greedy) puis optimiser son chemin à mesure que les cases deviennent vertes.
+    Press START: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
 
-_Projet réalisé dans le cadre d'une étude sur les agents autonomes et la prise de décision par renforcement._
+_Project developed as part of a study on autonomous agents and reinforcement learning decision-making._
