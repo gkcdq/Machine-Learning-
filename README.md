@@ -19,7 +19,7 @@ RLP is an experimental visualization platform for Reinforcement Learning integra
 ### 🧠 Learning Concepts (RL)
 
 The agent learns through trial and error. It receives rewards (positive or negative) based on its actions.
-__1. Double Q-Learning__
+#### 1. Double Q-Learning
 
 - To prevent the overestimation of reward values, the project uses two Q-tables (qTableA and qTableB).
 
@@ -31,10 +31,10 @@ Formula used:
 ```bash
 Qtarget ​= R + γ ⋅ Qeval​(s′ ,argmax Qupdate​(s′ ,a′))
 ```
-2. Experience Replay (Memory)
+#### 2. Experience Replay (Memory)
 
 The project stores past transitions in a replayBuffer. At each step, the AI "replays" a sample of 64 past transitions to stabilize its learning and prevent forgetting older paths.
-3. Reward Shaping (Reward Modeling)
+#### 3. Reward Shaping (Reward Modeling)
 
 The reward system is finely tuned to guide the agent:
 
