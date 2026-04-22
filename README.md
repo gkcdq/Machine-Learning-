@@ -2,11 +2,11 @@
 
 _This project has been created as a personal project_
 
-### 🤖 RLP: Reinforcement Learning & Pathfinding
+# 🤖 RLP: Reinforcement Learning & Pathfinding
 
 RLP is an experimental visualization platform for Reinforcement Learning integrated into an interactive grid environment. The goal is to train an agent to collect items and reach an exit optimally using modern AI algorithms.
 
-### 🚀 Features
+# 🚀 Features
 
 - Dynamic Map Editor: Draw `walls`, place `collectibles`, and define `start` / `exit` points in real-time.
 
@@ -20,7 +20,7 @@ RLP is an experimental visualization platform for Reinforcement Learning integra
 
 - Hybrid Pathfinding: Uses BFS (Breadth-First Search) for distance calculation and reward optimization.
 
-### 🧠 Learning Concepts (RL)
+# 🧠 Learning Concepts (RL)
 
 The agent learns through trial and error. It receives rewards (positive or negative) based on its actions.
 #### 1. Double Q-Learning
@@ -50,7 +50,7 @@ The reward system is finely tuned to guide the agent:
 
 `Stagnation` / `Back-and-forth`: Progressive penalties to force exploration.
 
-### 🛤️ Pathfinding & Optimization
+# 🛤️ Pathfinding & Optimization
 
 The AI does not simply walk at random; it utilizes graph theory algorithms to assist itself:
 
@@ -60,7 +60,7 @@ The AI does not simply walk at random; it utilizes graph theory algorithms to as
 
 - Map Validation: An algorithm verifies that the exit and collectibles are not isolated by walls before launching the simulation.
 
-### 🛠️ Technical Stack
+# 🛠️ Technical Stack
 
 - Frontend: React.js, TypeScript.
 
@@ -70,7 +70,7 @@ The AI does not simply walk at random; it utilizes graph theory algorithms to as
 
 - Environment: Docker & Nginx.
 
-### 📖 Installation
+# 📖 Installation
 
 - Clone the repository:
 ```Bash
@@ -82,7 +82,7 @@ docker-compose up --build
 ```
 - Access: Go to http://localhost:8080.
 
-### 🕹️ How to use?
+# 🕹️ How to use?
 
 - Draw _walls_ (Wall tool █).
 - Place _collectibles_ (◈) and an exit (⬡).
