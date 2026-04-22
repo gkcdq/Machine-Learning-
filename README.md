@@ -19,7 +19,7 @@ RLP est une plateforme expérimentale de visualisation d'apprentissage par renfo
 ### 🧠 Concepts d'Apprentissage (RL)
 
 L'agent apprend par essais et erreurs. Il reçoit des récompenses (positives ou négatives) en fonction de ses actions.
-1. Double Q-Learning
+#### 1. Double Q-Learning
 
 Pour éviter la surestimation des valeurs de récompense, le projet utilise deux tables Q (qTableA et qTableB).
 
