@@ -1,3 +1,7 @@
+# RLP
+
+_This project has been created as a personal project_
+
 ### 🤖 RLP: Reinforcement Learning & Pathfinding
 
 RLP is an experimental visualization platform for Reinforcement Learning integrated into an interactive grid environment. The goal is to train an agent to collect items and reach an exit optimally using modern AI algorithms.
