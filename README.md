@@ -121,3 +121,16 @@ make
 ├── Makefile            # Automation for build and cleanup
 └── docker-compose.yml  # Communication between Dockers 'Frontend' and 'Nginx'
 ```
+
+### Option 2 : L'image classique (PNG/SVG)
+Si tu préfères une image personnalisée, tu peux utiliser ce code Markdown :
+
+```markdown
+## 🔄 Reinforcement Learning Loop
+
+!
+
+1. **State**: The agent observes the current grid (position + items collected).
+2. **Action**: The agent chooses a direction based on Epsilon-Greedy policy.
+3. **Reward**: The environment gives feedback (+300 for a coin, -15 for a wall).
+4. **Update**: The agent stores the experience and updates its Q-Tables.
