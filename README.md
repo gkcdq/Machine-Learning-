@@ -132,8 +132,11 @@ The agent operates within a continuous feedback loop, learning to map environmen
 
 ### How it works in RLP:
 1.  **Observation (State)**: The agent identifies its current coordinates `(r, c)` and the current collection phase based on the optimal TSP order.
+
 2.  **Action Selection**: Using an **Epsilon-Greedy** policy, the agent either explores randomly or exploits known paths from the Q-Tables (`qTableA` & `qTableB`).
+
 3.  **Environment Feedback**:
     * **Positive Reward**: Collecting an item (+300) or reaching the exit (+1000).
     * **Negative Reward**: Hitting a wall (-15) or repetitive/stagnant movement.
+    
 4.  **Learning**: The agent updates its internal knowledge using **Double Q-Learning** and **Experience Replay** to stabilize the learning process.
