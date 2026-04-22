@@ -74,6 +74,19 @@ The AI does not simply walk at random; it utilizes graph theory algorithms to as
 
 # 📖 Installation
 
+-  __Prerequisites__
+
+-  Docker >= 24.0
+-  Docker Compose >= 2.0
+-  Git
+
+- __Configuration__ (.env)
+
+- Create a .env file at the root of the project:
+```
+#Database:
+POSTGRES_DB=postgres_name
+
 - Clone the repository:
 ```Bash
 git clone https://github.com/your-username/rlp.git
