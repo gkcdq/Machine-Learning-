@@ -83,11 +83,12 @@ The AI does not simply walk at random; it utilizes graph theory algorithms to as
 - __Configuration__ (.env)
 
 - Create a .env file at the root of the project:
-```
+```bash
 # Nginx / Domain
 DOMAIN_NAME=example
-
+```
 - Clone the repository:
+
 ```Bash
 git clone https://github.com/your-username/rlp.git
 ```
