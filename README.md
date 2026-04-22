@@ -10,7 +10,7 @@ RLP is an experimental visualization platform for __Reinforcement Learning__ int
 
 - Dynamic Map Editor: Draw `walls`, place `collectibles`, and define `start` / `exit` points in real-time.
 
-- Double Heatmap Visualization:
+#### Double Heatmap Visualization:
 
 - __Green__ (Q-Values): Visualizes the AI's "instinct" (what it "thinks" is the best path).
 
