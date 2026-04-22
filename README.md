@@ -50,44 +50,39 @@ The reward system is finely tuned to guide the agent:
 
 The AI does not simply walk at random; it utilizes graph theory algorithms to assist itself:
 
-    BFS (Breadth-First Search): Used to pre-calculate real distances between all points of interest (Start, Collectibles, Exit) by ignoring walls.
+- BFS (Breadth-First Search): Used to pre-calculate real distances between all points of interest (Start, Collectibles, Exit) by ignoring walls.
 
-    Nearest-Neighbor TSP: The AI calculates an optimal collection order before starting to structure its learning phases.
+- Nearest-Neighbor TSP: The AI calculates an optimal collection order before starting to structure its learning phases.
 
-    Map Validation: An algorithm verifies that the exit and collectibles are not isolated by walls before launching the simulation.
+- Map Validation: An algorithm verifies that the exit and collectibles are not isolated by walls before launching the simulation.
 
 ### 🛠️ Technical Stack
 
-    Frontend: React.js, TypeScript.
+- Frontend: React.js, TypeScript.
 
-    Styling: CSS-in-JS with dynamic CSS variables for the heatmap.
+- Styling: CSS-in-JS with dynamic CSS variables for the heatmap.
 
-    Build Tool: Vite.
+- Build Tool: Vite.
 
-    Environment: Docker & Nginx.
+- Environment: Docker & Nginx.
 
 ### 📖 Installation
 
-    Clone the repository:
-    Bash
-
-    git clone https://github.com/your-username/rlp.git
-
-    Launch with Docker:
-    Bash
-
-    docker-compose up --build
-
-    Access: Go to http://localhost:5173.
+- Clone the repository:
+```Bash
+git clone https://github.com/your-username/rlp.git
+```
+- Launch with Docker:
+```Bash
+docker-compose up --build
+```
+- Access: Go to http://localhost:5173.
 
 ### 🕹️ How to use?
 
-    Draw walls (Wall tool █).
-
-    Place items (◈) and an exit (⬡).
-
-    Define the start (◉).
-
-    Press START: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
+Draw _walls_ (Wall tool █).
+Place _collectibles_ (◈) and an exit (⬡).
+Define the _start_ (◉).
+Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
 
 _Project developed as part of a study on autonomous agents and reinforcement learning decision-making._
