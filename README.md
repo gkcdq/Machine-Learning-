@@ -1,6 +1,7 @@
 # RLP
 
 _This project has been created as a personal project_
+
 _Project developed to study on autonomous agents and reinforcement learning decision-making._
 
 # 🤖 RLP: Reinforcement Learning & Pathfinding
