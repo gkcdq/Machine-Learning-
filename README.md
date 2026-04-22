@@ -38,13 +38,13 @@ The project stores past transitions in a replayBuffer. At each step, the AI "rep
 
 The reward system is finely tuned to guide the agent:
 
-__Collection__: +300
+`Collection`: +300
 
-__Exit__ (if ready): +1000
+`Exit` (if ready): +1000
 
-__Wall Collision__: −15
+`Wall Collision`: −15
 
-__Stagnation__ / __Back-and-forth__: Progressive penalties to force exploration.
+`Stagnation` / `Back-and-forth`: Progressive penalties to force exploration.
 
 ### 🛤️ Pathfinding & Optimization
 
