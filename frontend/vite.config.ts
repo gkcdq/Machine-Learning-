@@ -7,10 +7,9 @@ export default defineConfig({
     host: true,
     port: 5173,
     hmr: {
-      protocol: 'wss',   // SSL car ton nginx est en 443 https
+      protocol: 'ws',    // On repasse en 'ws' (non-sécurisé)
       host: 'localhost',
-      port: 443,         // le port exposé au browser, pas celui de Vite
-      clientPort: 443,
+      port: 5173,        // On s'aligne sur le port de Vite
     },
   },
 })

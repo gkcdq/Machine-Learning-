@@ -9,7 +9,9 @@ RUN mkdir -p /etc/ssl/certs /etc/ssl/private && \
     -subj "/C=FR/ST=Paris/O=42/CN=tmilin.42.fr" \
     -keyout /etc/ssl/private/nginx.key \
     -out /etc/ssl/certs/nginx.crt
+
 RUN chmod 777 /etc/ssl/private/nginx.key
+
 COPY ./nginx.conf /etc/nginx/nginx.conf
 EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]

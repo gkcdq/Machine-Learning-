@@ -1,6 +1,7 @@
 import { CellType } from "../map/cell";
 import { MapData } from "./agent";
 
+// pour les data de la map 
 export function parseMap(map: CellType[][]): MapData {
   const rows = map.length;
   const cols = map[0]?.length ?? 0;
@@ -11,8 +12,6 @@ export function parseMap(map: CellType[][]): MapData {
   const walls: [number, number][] = [];
   let iaposeX = 0;
   let iaposeY = 0;
-  let spawnX = 0;
-  let spawnY = 0;
 
   for (let r = 0; r < rows; r++)
     {

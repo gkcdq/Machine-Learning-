@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
-import { Cell, CellType } from "./cell";
-import { stopRandomMovement, qTableA, qTableB } from "../IA/agent";
+import { Cell, CellType, } from "./cell";
+import { stopRandomMovement, qTableA, qTableB, resetAgentStats, visitFreq} from "../IA/agent";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types
 
 type Tool = CellType | "eraser";
 
@@ -27,7 +27,7 @@ export interface GridHandle {
   restoreCell: (row: number, col: number, type: CellType) => void;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// Constants
 
 const DEFAULT_ROWS = 15;
 const DEFAULT_COLS = 20;
@@ -40,7 +40,7 @@ const TOOLS: { tool: Tool; label: string; icon: string; hint: string }[] = [
   { tool: "eraser",      label: "Gomme",       icon: "⌫", hint: "Efface une cellule"        },
 ];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// helpers
 
 function makeGrid(rows: number, cols: number): CellType[][] {
   return Array.from({ length: rows }, () => Array(cols).fill("empty") as CellType[]);
@@ -84,11 +84,19 @@ function validateMap(cells: CellType[][]): string | null {
   const reachable = bfsReachable(cells, start);
   if (!reachable.has(`${exit.row},${exit.col}`))
     return "⛔  La sortie ou le depart est isolée par des murs !";
-
+  for (let r = 0; r < cells.length; r++) {
+      for (let c = 0; c < cells[r].length; c++) {
+        if (cells[r][c] === "collectible") {
+          if (!reachable.has(`${r},${c}`)) {
+            return `⛔ Un collectible en [${r},${c}] est inaccessible !`;
+          }
+        }
+      }
+    }
   return null;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// component
 
 export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
   ({ onStart }, ref) => {
@@ -108,15 +116,11 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
   const frozenMap    = useRef<CellType[][] | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // ── API exposée à ton code IA ──────────────────────────────────────────────
-
     useImperativeHandle(ref, () => ({
         moveAgent(row: number, col: number) { setAgentPos({row, col}) },
         stopAgent() { isRunning == false; stopRandomMovement() },
         getMap() { return frozenMap.current ?? grid.cells; },
         getSize() { return { rows: grid.rows, cols: grid.cols }; },
-        
-        // Ajoute cette fonction ici :
         triggerStartStop() { handleStartStop(); },
         consumeCell(row: number, col: number) {
           setGrid((prev) => {
@@ -136,7 +140,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
         },
     }));
 
-  // ── Edition ───────────────────────────────────────────────────────────────
+  // edition
 
   const applyTool = useCallback(
     (row: number, col: number) => {
@@ -181,7 +185,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
     [isPainting, applyTool]
   );
 
-  // ── START / STOP ──────────────────────────────────────────────────────────
+  //START / STOP
 
   const handleStartStop = () => {
     if (isRunning) {
@@ -189,7 +193,7 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
       setAgentPos(null);
       frozenMap.current = null;
       stopRandomMovement();
-      setStatusMsg("Simulation arrêtée.");
+      setStatusMsg("Simulation stop.");
       return;
     }
 
@@ -207,59 +211,51 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
     if (onStart) onStart();
   };
 
-  // ── Autres ────────────────────────────────────────────────────────────────
+  // Autres 
 
   const clearGrid = () => {
     if (isRunning) return;
     setGrid((prev) => ({ ...prev, cells: makeGrid(prev.rows, prev.cols) }));
+    resetAgentStats();
     setStatusMsg("Grille effacée.");
   };
 
   const countOf = (type: CellType) =>
     grid.cells.flat().filter((c) => c === type).length;
 
-  const renderCell = (cellType: CellType, r: number, c: number) => {
-      // 1. On définit le préfixe de la clé pour cette cellule (ex: "5,3|")
-      const cellPrefix = `${r},${c}|`;
 
-      // 2. On récupère toutes les clés qui commencent par ce préfixe dans les deux tables
-      const keysA = Object.keys(qTableA).filter(k => k.startsWith(cellPrefix));
-      const keysB = Object.keys(qTableB).filter(k => k.startsWith(cellPrefix));
+const renderCell = (cellType: CellType, r: number, c: number) => {
+  const cellKey = `${r},${c}`;
+  const stateKeys = Object.keys(qTableA).filter(k => k.startsWith(`${cellKey}|`));
+  let maxQ = 0;
+  stateKeys.forEach(k => {
+    maxQ = Math.max(maxQ, ...qTableA[k]);
+  });
+  const qIntensity = Math.min(Math.max(maxQ, 0) / 1000, 1);
+  const visits = visitFreq[cellKey] || 0;
+  const visitIntensity = Math.min(visits / 20, 1);
 
-      let maxQ = 0;
+  const isAgent = agentPos?.row === r && agentPos?.col === c;
 
-      // 3. On cherche la valeur maximale enregistrée pour cette case, toutes phases confondues
-      keysA.forEach(k => {
-        maxQ = Math.max(maxQ, ...qTableA[k]);
-      });
-      keysB.forEach(k => {
-        maxQ = Math.max(maxQ, ...qTableB[k]);
-      });
-
-      // 4. Normalisation pour l'affichage (ajuste le diviseur 1000 selon tes récompenses)
-      // Comme ta victoire est à 1000, on divise par 1000 pour avoir un ratio entre 0 et 1
-      const normalizedQ = maxQ > 0 ? Math.min(maxQ / 1000, 1) : 0;
-      
-      const isAgent = agentPos?.row === r && agentPos?.col === c;
-
-      return (
-        <Cell
-          key={`${r}-${c}`}
-          type={isAgent ? "agent" : cellType}
-          row={r}
-          col={c}
-          qValue={normalizedQ} // La heatmap utilisera cette valeur
-          onClick={handleClick}
-          onRightClick={handleRightClick}
-          onMouseEnter={handleMouseEnter}
-        />
-      );
-    };
+  return (
+    <Cell
+      key={`${r}-${c}`}
+      type={isAgent ? "agent" : cellType}
+      row={r}
+      col={c}
+      qIntensity={qIntensity}
+      visitIntensity={visitIntensity}
+      onClick={handleClick}
+      onRightClick={handleRightClick}
+      onMouseEnter={handleMouseEnter}
+    />
+  );
+};
 
   // heat map
   
 
-  // ─── JSX ──────────────────────────────────────────────────────────────────
+  // JSX
 
   return (
     <>
@@ -315,19 +311,19 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
         .grid-wrap {
           border: 1px solid rgba(255,255,255,.55);
           border-radius: 8px; overflow: hidden;
-          box-shadow: 0 0 40px rgba(0,229,255,.05);
+          box-shadow: 0 0 40px rgba(25, 0, 255, 0.05);
           position: relative; transition: border-color .3s, box-shadow .3s;
         }
         .grid-wrap.running { border-color: rgba(0,229,255,.7); box-shadow: 0 0 24px rgba(0,229,255,.12); }
         .grid-wrap::before {
           content: ''; position: absolute; inset: 0;
           background:
-            repeating-linear-gradient(0deg,  transparent, transparent 39px, rgba(0,229,255,.03) 40px),
-            repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,229,255,.03) 40px);
+            repeating-linear-gradient(0deg,  transparent, transparent 38px, rgba(0,229,255,.03) 39px),
+            repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(0,229,255,.03) 39px);
           pointer-events: none; z-index: 10;
         }
 
-        .grid { display: grid; gap: 1px; background: rgba(0,229,255,.06); user-select: none; }
+        .grid { display: grid; gap: 1px; background: rgba(0, 54, 115, 0.12); user-select: none; }
         .cell       { width: 38px; height: 38px; }
         .cell:hover { filter: brightness(1.4); z-index: 2; }
         .cell--wall        { background-color: #1e2a3a !important; }
@@ -389,8 +385,8 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
       <div className="map-app">
 
         <div className="map-header">
-          <div className="map-title">PATHFINDING IA</div>
-          <div className="map-subtitle">// MACHINE LEARNING && PATHFINDING</div>
+          <div className="map-title">RLP</div>
+          <div className="map-subtitle">REINFORCEMENT LEARNING && PATHFINDING</div>
         </div>
 
         <div className="toolbar">
@@ -462,12 +458,12 @@ export const Grid = forwardRef<GridHandle, { onStart?: () => void }>(
           <div className="legend-item"><div className="legend-dot" style={{ background:"#051510", border:"1px solid #50e050" }} />Sortie</div>
           <div className="legend-item"><div className="legend-dot" style={{ background:"#150520", border:"1px solid #c050ff" }} />Départ IA</div>
         </div>
-
+        <pr></pr>
         <div className="ia-panel">
-          <strong>[ MOTEUR IA ]</strong>
-          Place un point de départ ◉ et une sortie ⬡, puis l'agent Q-learning itérera ici.
+          <strong>[ NOTICE ]</strong>
+          Place un point de départ ◉ et une sortie ⬡, puis l'IA itérera ici.
           <br />
-          Les cellules vides afficheront une heatmap des Q-values à chaque epoch.
+          Les cellules vides afficheront une heatmap évolutive des Q-values.
         </div>
 
       </div>

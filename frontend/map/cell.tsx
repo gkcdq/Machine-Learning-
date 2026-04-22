@@ -9,17 +9,9 @@ interface CellProps {
   onClick: (row: number, col: number) => void;
   onRightClick: (row: number, col: number, e: React.MouseEvent) => void;
   onMouseEnter: (row: number, col: number) => void;
-  qValue?: number; // 0-1, heat for Q-learning visualization
+  qIntensity?: number;
+  visitIntensity?: number;
 }
-
-const CELL_ICONS: Record<CellType, string> = {
-  empty: "",
-  wall: "█",
-  collectible: "◈",
-  exit: "⬡",
-  start: "◉",
-  agent: "▲",
-};
 
 const CELL_COLORS: Record<CellType, string> = {
   empty: "var(--cell-empty)",
@@ -30,17 +22,13 @@ const CELL_COLORS: Record<CellType, string> = {
   agent: "var(--cell-agent)",
 };
 
+// resume : couleur de la grille
 export const Cell: React.FC<CellProps> = ({
-  type,
-  row,
-  col,
-  onClick,
-  onRightClick,
-  onMouseEnter,
-  qValue,
+  type, row, col, onClick, onRightClick, onMouseEnter,
+  qIntensity = 0,
+  visitIntensity = 0,
 }) => {
-  const heatOpacity = qValue !== undefined ? qValue * 0.6 : 0;
-
+  const mixColor = `rgba(${visitIntensity * 255}, ${qIntensity * 255}, 0, ${Math.max(qIntensity, visitIntensity) * 0.5})`;
   return (
     <div
       className={`cell cell--${type}`}
@@ -48,42 +36,23 @@ export const Cell: React.FC<CellProps> = ({
       onContextMenu={(e) => onRightClick(row, col, e)}
       onMouseEnter={() => onMouseEnter(row, col)}
       style={{
-        backgroundColor: CELL_COLORS[type],
+        backgroundColor: type === "empty" ? mixColor : CELL_COLORS[type],
         position: "relative",
         cursor: "crosshair",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        transition: "background-color 0.15s ease, transform 0.1s ease",
-        userSelect: "none",
+        transition: "background-color 0.2s ease",
+        border: "none",        
+        outline: "none",     
+        width: "100%",         
+        height: "100%",
+        boxSizing: "border-box"
       }}
-      title={`[${row},${col}] ${type}`}
+      title={`[${row},${col}] Q:${qIntensity.toFixed(2)} V:${visitIntensity.toFixed(2)}`}
     >
-      {/* Q-value heat overlay */}
-      {qValue !== undefined && type === "empty" && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: `rgba(255, 80, 80, ${heatOpacity})`,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
-      {/* Icon */}
-      <span
-        style={{
-          fontSize: "clamp(10px, 1.4vw, 20px)",
-          lineHeight: 1,
-          zIndex: 1,
-          color: type === "wall" ? "var(--wall-icon)" : "var(--icon-color)",
-          filter:
-            type === "agent" ? "drop-shadow(0 0 4px var(--cell-agent))" : "none",
-          animation: type === "agent" ? "agentPulse 1s infinite alternate" : "none",
-        }}
-      >
-        {CELL_ICONS[type]}
+      <span style={{ zIndex: 1, lineHeight: 1 }}>
+        {type === "collectible" ? "◈" : type === "exit" ? "⬡" : type === "start" ? "◉" : type === "agent" ? "▲" : ""}
       </span>
     </div>
   );

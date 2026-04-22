@@ -1,9 +1,9 @@
 import React from "react";
-import { GridHandle } from "../map/grid";
+import type { GridHandle } from "../map/grid";
 import { CellType } from "../map/cell";
 import { parseMap } from "./utils";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types
 
 export interface MapData {
   start: [number, number] | null;
@@ -25,7 +25,7 @@ interface Transition {
   done:         boolean;
 }
 
-// ─── Configuration ────────────────────────────────────────────────────────────
+// Configuration 
 
 const ALPHA          = 0.15;
 const GAMMA          = 0.95;
@@ -34,37 +34,28 @@ const EPSILON_MIN    = 0.05;
 const HISTORY_SIZE   = 20;
 
 // Experience Replay
-const REPLAY_CAPACITY = 5000; // taille max du buffer
-const REPLAY_BATCH    = 32;   // transitions rejouées par step
-const REPLAY_START    = 200;  // n'apprend depuis le buffer qu'après N transitions
+const REPLAY_CAPACITY = 50000;// taille max du buffer
+const REPLAY_BATCH    = 64;// transitions rejouées par step
+const REPLAY_START    = 200;// n'apprend depuis le buffer qu'après N transitions
 
-// Double Q-Learning : swap toutes les N steps
-const SWAP_INTERVAL = 500;
+// etat Global 
 
-// ─── État Global ──────────────────────────────────────────────────────────────
-
-// Double Q-Learning : deux tables, on alterne laquelle est "active"
+// Double Q-learning
 export let qTableA: Record<string, number[]> = {};
 export let qTableB: Record<string, number[]> = {};
-export let qTable  = qTableA; // alias pour la compat avec saveSessionToDB
+export let qTable  = qTableA;
 
 let moveInterval: ReturnType<typeof setInterval> | null = null;
 let count      = 0;
-let totalSteps = 0; // compteur global pour le swap et le replay
-
+let totalSteps = 0;
 let posHistory: string[]              = [];
-let visitFreq:  Record<string, number> = {};
-
-// Buffer de replay
+export let visitFreq:  Record<string, number> = {};
 const replayBuffer: Transition[] = [];
 
-// ─── Q-Table helpers (Double Q-Learning) ─────────────────────────────────────
+// Qtable helpers 
 
-/**
- * État enrichi : position + index du prochain collectible cible.
- * Bien plus précis que "count" — l'agent sait QUOI chercher, pas juste COMBIEN.
- */
 function makeStateKey(r: number, c: number, nextTargetIdx: number): string {
+  // peut etre faire une politique de contournement de mur idk
   return `${r},${c}|t${nextTargetIdx}`;
 }
 
@@ -73,8 +64,9 @@ function getValues(table: Record<string, number[]>, key: string): number[] {
   return table[key];
 }
 
-// Choix d'action : on utilise A pour choisir, B pour évaluer (Double Q)
-function chooseAction(key: string, epsilon: number): number {
+// choix d'action, A pour choisir, B pour évaluer
+function chooseAction(key: string, epsilon: number): number
+{
   if (Math.random() < epsilon) return Math.floor(Math.random() * 4);
   const vals = getValues(qTableA, key);
   return vals.indexOf(Math.max(...vals));
@@ -85,11 +77,9 @@ function updateQ(
   stateKey: string, action: number, reward: number,
   nextKey: string, done: boolean
 ) {
-  // 50% chance : update A en utilisant B pour évaluer le next state
-  // 50% chance : update B en utilisant A pour évaluer le next state
-  const [updateTable, evalTable] = Math.random() < 0.5
-    ? [qTableA, qTableB]
-    : [qTableB, qTableA];
+  // 50% chance d' up A en utilisant B pour evaluer le next state
+  // 50% chance d' up B en utilisant A pour evaluer le next state
+  const [updateTable, evalTable] = Math.random() < 0.5 ? [qTableA, qTableB] : [qTableB, qTableA];
 
   const current   = getValues(updateTable, stateKey);
   const nextEval  = getValues(evalTable,   nextKey);
@@ -104,7 +94,7 @@ function updateQ(
   current[action] += ALPHA * (target - current[action]);
 }
 
-// ─── Experience Replay ────────────────────────────────────────────────────────
+// Experience Replay
 
 function pushTransition(t: Transition) {
   replayBuffer.push(t);
@@ -122,7 +112,7 @@ function replayBatch() {
   }
 }
 
-// ─── BFS avec cache ───────────────────────────────────────────────────────────
+// BFS avec cache
 
 let distCache: Record<string, Record<string, number>> = {};
 
@@ -156,7 +146,7 @@ function cachedDist(
   return distCache[k][`${toR},${toC}`] ?? Infinity;
 }
 
-// ─── Ordre optimal des collectibles (nearest-neighbor TSP) ───────────────────
+// Ordre optimal des collectibles (nearest-neighbor TSP) a retravailler si jamais plus tard x(
 
 function computeOptimalOrder(
   map: CellType[][], fromR: number, fromC: number,
@@ -180,39 +170,30 @@ function computeOptimalOrder(
   return ordered;
 }
 
-// ─── Backend & Persistance ────────────────────────────────────────────────────
+// persistance (a retravailler je vois pas comment l'implementer correctement)
 
-export async function saveSessionToDB(data: MapData): Promise<number | null> {
+export function saveSessionToLocalStorage(data: MapData): void {
   try {
-    const res = await fetch("/api/ia/session/save/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        rows: data.rows,
-        cols: data.cols,
-        collectibles: data.collectibles.map(([r, c]) => [c, r]),
-        q_table: qTableA,
-      }),
-    });
-    const json = await res.json();
-    if (json.status === "ok") return json.session_id;
-    return null;
-  } catch { return null; }
+    const session = {
+      q_table: qTableA,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem("rl_agent_session", JSON.stringify(session));
+  } catch (e) {
+    console.error("Erreur de sauvegarde locale", e);
+  }
 }
 
-export async function loadLastSession(): Promise<{ sessionId: number; collectibles: [number, number][] } | null> {
-  try {
-    const res  = await fetch("/api/ia/session/last/");
-    const json = await res.json();
-    if (json.status !== "ok") return null;
-    const collectibles: [number, number][] = json.collectibles.map(
-      (c: { x: number; y: number }) => [c.y, c.x] as [number, number]
-    );
-    return { sessionId: json.session_id, collectibles };
-  } catch { return null; }
+export function loadSessionFromLocalStorage(): any {
+  const saved = localStorage.getItem("rl_agent_session");
+  if (!saved) return null;
+  const data = JSON.parse(saved);
+  qTableA = data.q_table || {};
+  qTableB = { ...qTableA }; // on sync les deux tables au chargement
+  return data;
 }
 
-// ─── Logique principale ───────────────────────────────────────────────────────
+//logique principale
 
 export function startMovement(
   gridRef: React.RefObject<GridHandle>,
@@ -236,7 +217,7 @@ export function startMovement(
 
   const totalCollectibles = collectiblesList.length;
 
-  // Précalcul BFS
+  //   precalcul BFS
   distCache = {};
   console.log("[IA] Précalcul BFS...");
   const sources: [number, number][] = [
@@ -250,18 +231,18 @@ export function startMovement(
   });
   console.log(`[IA] BFS précalculé pour ${sources.length} points.`);
 
-  // Ordre optimal
+  //ordre optimal
   const optimalOrder = computeOptimalOrder(
     initialMap, startX, startY, [...collectiblesList], exitR, exitC
   );
   console.log("[IA] Ordre optimal :", optimalOrder);
 
-  // Reset Q-tables et buffer pour une nouvelle map
+  // Reset Q-tables et buffer pour neww map
   qTableA = {}; qTableB = {};
   replayBuffer.length = 0;
   totalSteps = 0;
 
-  // Init épisode
+  // Init episode
   let curX = startX, curY = startY;
   let prevX = startX, prevY = startY;
   let picked         = new Set<string>();
@@ -274,13 +255,13 @@ export function startMovement(
     if (!gridRef.current) return;
     const map = gridRef.current.getMap();
 
-    // Index du prochain collectible cible dans l'ordre optimal
+    // index du prochain collectible cible dans l'ordre optimal
     const nextTargetIdx = optimalOrder.findIndex(k => !picked.has(k));
-    // -1 si tous ramassés → on encode totalCollectibles comme "phase sortie"
+    // -1 si tous ramassés
     const targetPhase   = nextTargetIdx === -1 ? totalCollectibles : nextTargetIdx;
     const stateKey      = makeStateKey(curX, curY, targetPhase);
 
-    // ── 1. Choix de l'action ──────────────────────────────────────────────────
+    // 1 Choix de l'action
     const action = chooseAction(stateKey, currentEpsilon);
 
     let nr = curX, nc = curY;
@@ -289,7 +270,7 @@ export function startMovement(
     if (action === 2) nc--;
     if (action === 3) nc++;
 
-    // ── 2. Récompense ─────────────────────────────────────────────────────────
+    // 2 recompense
     let reward = -1;
     const targetCell = map[nr]?.[nc];
     const nextPicked = new Set(picked);
@@ -316,7 +297,7 @@ export function startMovement(
       }
     }
 
-    // ── 3. Reward shaping ─────────────────────────────────────────────────────
+    // 3 reward shaping
     if (nr !== curX || nc !== curY) {
       if (nextTargetIdx !== -1) {
         // Phase collecte : guider vers le prochain dans l'ordre optimal
@@ -339,54 +320,43 @@ export function startMovement(
       }
     }
 
-    // ── Mémoire sortie ────────────────────────────────────────────────────────
+    //memoire sortie
     if (targetCell === "exit" && !exitSeen) {
       exitSeen = true;
       console.log(`[IA] Sortie mémorisée en [${exitR},${exitC}]`);
     }
-
-    // ── 4. Anti-cycle ─────────────────────────────────────────────────────────
-// ── 4. Anti-cycle ─────────────────────────────────────────────────────────
+    //  4 Anti-cycle
     
-    // Pénalité massive si l'agent fait un aller-retour immédiat (U-Turn)
+    // aller-retour
     if (nr === prevX && nc === prevY) {
       reward -= 60; 
     }
-
     const posKey = `${nr},${nc}`;
-    
-    // Pénalité pour les petites boucles (ex: carré de 4 cases)
+    // petites boucles
     const recentCount = posHistory.filter(p => p === posKey).length;
     if (recentCount >= 2) {
       reward -= 20 * recentCount; 
     }
 
-    // Pénalité de stagnation (l'agent reste dans la même zone trop longtemps)
+    //stagnation
     visitFreq[posKey] = (visitFreq[posKey] ?? 0) + 1;
-    if (visitFreq[posKey] > 4) {
-      // On diminue la récompense dynamiquement. 
-      // Plus il passe ici, plus le pas coûte cher, mais on NE TOUCHE PAS à la Q-Table directement.
+    if (visitFreq[posKey] > 4)
+    {
       reward -= 5 * visitFreq[posKey]; 
     }
 
     posHistory.push(posKey);
     if (posHistory.length > HISTORY_SIZE) posHistory.shift();
 
-    // ── 5. Apprentissage ──────────────────────────────────────────────────────
+    // apprentissage
     const nextPhase    = nextPicked.size === totalCollectibles ? totalCollectibles
                        : optimalOrder.findIndex(k => !nextPicked.has(k));
     const nextStateKey = makeStateKey(nr, nc, nextPhase === -1 ? totalCollectibles : nextPhase);
-
-    // Mise à jour immédiate (online)
     updateQ(stateKey, action, reward, nextStateKey, done);
-
-    // Stocke dans le buffer
     pushTransition({ stateKey, action, reward, nextStateKey, done });
-
-    // Replay batch tous les steps
     replayBatch();
 
-    // ── 6. Mise à jour état ───────────────────────────────────────────────────
+    // 6 maj detat
     prevX  = curX; // 👈 3. On enregistre d'où on vient
     prevY  = curY;
     curX   = nr;
@@ -395,11 +365,12 @@ export function startMovement(
     gridRef.current.moveAgent(curX, curY);
     totalSteps++;
 
-    // ── 7. Décroissance epsilon ───────────────────────────────────────────────
+    // 7 enleve du rng
     if (currentEpsilon > EPSILON_MIN) currentEpsilon *= 0.9998;
 
-    // ── 8. Reset épisode ──────────────────────────────────────────────────────
-    if (done) {
+    // 8 reset episode
+    if (done)
+    {
       count++;
       console.log(`Épisode ${count} | Epsilon : ${currentEpsilon.toFixed(3)} | Buffer : ${replayBuffer.length}`);
 
@@ -417,20 +388,30 @@ export function startMovement(
   }, 0);
 }
 
-export function stopRandomMovement() {
+export function stopRandomMovement()
+{
   if (moveInterval) {
     clearInterval(moveInterval);
     moveInterval = null;
   }
 }
 
-export async function runAgent(gridRef: React.RefObject<GridHandle>) {
+export async function runAgent(gridRef: React.RefObject<GridHandle>)
+{
   if (!gridRef.current) return;
   const map  = gridRef.current.getMap();
   const data = parseMap(map);
   if (!data.start) return;
   const [startRow, startCol] = data.start;
-  await loadLastSession();
+  loadSessionFromLocalStorage();
   startMovement(gridRef, data.rows, data.cols, startRow, startCol);
-  saveSessionToDB(data);
+  saveSessionToLocalStorage(data);
+}
+
+export function resetAgentStats()
+{
+  visitFreq = {};      
+  posHistory = [];     
+  qTableA = {}; 
+  qTableB = {};
 }

@@ -7,14 +7,12 @@ import { runAgent } from '../IA/agent';
 ///////////////////////////////////////////////////////////////////////
 const App = () => {
   const gridRef = useRef<GridHandle>(null); //
-
-  // Cette fonction est maintenant branchée directement sur le bouton START de la grille
   const handleStartIA = () => {
     if (gridRef.current) {
       const map = gridRef.current.getMap(); //
       runAgent(gridRef);
       
-      // Ici, envoyer la 'map' à backend Django
+      // Ici, envoyer la 'map' à backend Django si jamais je fais un db django x postgre
     }
   };
 
@@ -29,7 +27,7 @@ const App = () => {
       justifyContent: 'center',
       fontFamily: 'Oxanium, sans-serif',
     }}>
-      {/* On passe handleStartIA à la prop onStart de la Grid */}
+      {}
       <Grid ref={gridRef} onStart={handleStartIA} />
     </div>
   );
