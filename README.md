@@ -23,11 +23,11 @@ L'agent apprend par essais et erreurs. Il reçoit des récompenses (positives ou
 
 Pour éviter la surestimation des valeurs de récompense, le projet utilise deux tables Q (qTableA et qTableB).
 
-    L'agent choisit une action avec une table.
+- L'agent choisit une action avec une table.
 
-    Il met à jour la valeur en utilisant la seconde table pour évaluer le prochain état.
+- Il met à jour la valeur en utilisant la seconde table pour évaluer le prochain état.
 
-    Formule utilisée :
+### Formule utilisée :
 
     ```bash
     Qtarget​=R+γ⋅Qeval​(s′,argmax Qupdate​(s′,a′))
