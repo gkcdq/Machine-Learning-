@@ -19,7 +19,7 @@ RLP is an experimental visualization platform for Reinforcement Learning integra
 ### 🧠 Learning Concepts (RL)
 
 The agent learns through trial and error. It receives rewards (positive or negative) based on its actions.
-1. Double Q-Learning
+__1. Double Q-Learning__
 
 - To prevent the overestimation of reward values, the project uses two Q-tables (qTableA and qTableB).
 
