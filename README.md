@@ -108,9 +108,9 @@ make
 
 # 🕹️ How to use?
 
-- Draw _walls_ (Wall tool █).
-- Place _collectibles_ (◈) and an _exit_ (⬡).
-- Define the _start_ (◉).
+- Draw _'walls'_ (Wall tool █).
+- Place _'collectibles'_ (◈) and an _'exit'_ (⬡).
+- Define the _'start'_ (◉).
 - Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
 
 # 📂 Project Structure
