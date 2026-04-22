@@ -1,6 +1,7 @@
 # RLP
 
 _This project has been created as a personal project_
+_Project developed to study on autonomous agents and reinforcement learning decision-making._
 
 # 🤖 RLP: Reinforcement Learning & Pathfinding
 
@@ -87,5 +88,3 @@ docker-compose up --build
 - Place _collectibles_ (◈) and an exit (⬡).
 - Define the _start_ (◉).
 - Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
-
-_Project developed as part of a study on autonomous agents and reinforcement learning decision-making._
