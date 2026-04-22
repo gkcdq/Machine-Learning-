@@ -8,28 +8,13 @@ _This project has been created as a personal project_
 
 _Project developed to study on autonomous agents and reinforcement learning decision-making._
 
-# 🤖 RLP: Reinforcement Learning & Pathfinding
-
-RLP is an experimental visualization platform for __Reinforcement Learning__ integrated into an interactive grid environment. The goal is to train an agent to collect items and reach an exit optimally using modern __AI algorithms__.
-
-## 🔄 Decision Cycle (RL Loop)
-
-The agent operates within a continuous feedback loop, learning to map environmental states to optimal actions.
-
 <p align="center">
   <img src="https://media.discordapp.net/attachments/1484976360974713054/1496368286567239690/RLP.png?ex=69e9a110&is=69e84f90&hm=74637000baca2e71105c826eaeeecf17883a5dc7ebe0d3a78169b812220dab7c&=&format=webp&quality=lossless&width=1180&height=891" width="600" alt="Reinforcement Learning Loop">
 </p>
 
-### How it works in RLP:
-1.  **Observation (State)**: The agent identifies its current coordinates `(r, c)` and the current collection phase based on the optimal TSP order.
+# 🤖 RLP: Reinforcement Learning & Pathfinding
 
-2.  **Action Selection**: Using an **Epsilon-Greedy** policy, the agent either explores randomly or exploits known paths from the Q-Tables (`qTableA` & `qTableB`).
-
-3.  **Environment Feedback**:
-    * **Positive Reward**: Collecting an item (+300) or reaching the exit (+1000).
-    * **Negative Reward**: Hitting a wall (-15) or repetitive / stagnant movement.
-
-4.  **Learning**: The agent updates its internal knowledge using **Double Q-Learning** and **Experience Replay** to stabilize the learning process.
+RLP is an experimental visualization platform for __Reinforcement Learning__ integrated into an interactive grid environment. The goal is to train an agent to collect items and reach an exit optimally using modern __AI algorithms__.
 
 # 🚀 Features
 
