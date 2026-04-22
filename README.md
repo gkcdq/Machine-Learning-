@@ -28,10 +28,9 @@ Pour éviter la surestimation des valeurs de récompense, le projet utilise deux
 - Il met à jour la valeur en utilisant la seconde table pour évaluer le prochain état.
 
 ### Formule utilisée :
-
-    ```bash
-    Qtarget​=R+γ⋅Qeval​(s′,argmax Qupdate​(s′,a′))
-    ```
+```bash
+Qtarget​=R+γ⋅Qeval​(s′,argmax Qupdate​(s′,a′))
+```
 
 2. Experience Replay (Mémoire)
 
