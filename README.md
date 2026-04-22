@@ -27,7 +27,7 @@ The agent learns through trial and error. It receives rewards (positive or negat
 
 - It updates the value using the second table to evaluate the next state.
 
-Formula used:
+##### Formula used:
 ```bash
 Qtarget ​= R + γ ⋅ Qeval​(s′ ,argmax Qupdate​(s′ ,a′))
 ```
