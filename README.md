@@ -109,7 +109,7 @@ make
 # 🕹️ How to use?
 
 - Draw _walls_ (Wall tool █).
-- Place _collectibles_ (◈) and an exit (⬡).
+- Place _collectibles_ (◈) and an _exit_ (⬡).
 - Define the _start_ (◉).
 - Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
 
