@@ -122,15 +122,18 @@ make
 └── docker-compose.yml  # Communication between Dockers 'Frontend' and 'Nginx'
 ```
 
-### Option 2 : L'image classique (PNG/SVG)
-Si tu préfères une image personnalisée, tu peux utiliser ce code Markdown :
+## 🔄 Decision Cycle (RL Loop)
 
-```markdown
-## 🔄 Reinforcement Learning Loop
+The agent operates within a continuous feedback loop, learning to map environmental states to optimal actions.
 
-!
+<p align="center">
+  <img src="path/to/your/image_28d4bf.png" width="600" alt="Reinforcement Learning Loop">
+</p>
 
-1. **State**: The agent observes the current grid (position + items collected).
-2. **Action**: The agent chooses a direction based on Epsilon-Greedy policy.
-3. **Reward**: The environment gives feedback (+300 for a coin, -15 for a wall).
-4. **Update**: The agent stores the experience and updates its Q-Tables.
+### How it works in RLP:
+1.  **Observation (State)**: The agent identifies its current coordinates `(r, c)` and the current collection phase based on the optimal TSP order.
+2.  **Action Selection**: Using an **Epsilon-Greedy** policy, the agent either explores randomly or exploits known paths from the Q-Tables (`qTableA` & `qTableB`).
+3.  **Environment Feedback**:
+    * **Positive Reward**: Collecting an item (+300) or reaching the exit (+1000).
+    * **Negative Reward**: Hitting a wall (-15) or repetitive/stagnant movement.
+4.  **Learning**: The agent updates its internal knowledge using **Double Q-Learning** and **Experience Replay** to stabilize the learning process.
