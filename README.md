@@ -10,15 +10,14 @@ RLP is an experimental visualization platform for __Reinforcement Learning__ int
 
 - Dynamic Map Editor: Draw `walls`, place `collectibles`, and define `start` / `exit` points in real-time.
 
+- Reinforcement Learning Engine: Full implementation of Double Q-Learning with experience replay memory.
+
+- Hybrid Pathfinding: Uses BFS (Breadth-First Search) for distance calculation and reward optimization.
 #### Double Heatmap Visualization:
 
 - __Green__ (Q-Values): Visualizes the AI's "instinct" (what it "thinks" is the best path).
 
 - __Red__ (Frequency): Visualizes experience (the most explored areas).
-
-- Reinforcement Learning Engine: Full implementation of Double Q-Learning with experience replay memory.
-
-- Hybrid Pathfinding: Uses BFS (Breadth-First Search) for distance calculation and reward optimization.
 
 # 🧠 Learning Concepts (RL)
 
