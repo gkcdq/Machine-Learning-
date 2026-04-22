@@ -92,9 +92,9 @@ DOMAIN_NAME=example
 ```Bash
 git clone https://github.com/your-username/rlp.git
 ```
-- Launch with Docker:
+- Go to the root of the project:
 ```Bash
-docker-compose up --build
+make
 ```
 - Access: Go to http://localhost:8080.
 
