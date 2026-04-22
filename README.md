@@ -104,3 +104,16 @@ make
 - Place _collectibles_ (◈) and an exit (⬡).
 - Define the _start_ (◉).
 - Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
+
+# 📂 Project Structure
+
+```text
+├── frontend
+│   ├── IA           # RL Logic: Agent, Experience Replay, Q-Learning
+│   ├── map          # Grid components, Cell rendering, Map logic
+│   ├── src          # React entry point
+│   └── structure    # Dockerfile for frontend build
+├── nginx            # Reverse proxy & static serving configuration
+├── Makefile         # Automation for build and cleanup
+└── docker-compose.yml
+```
