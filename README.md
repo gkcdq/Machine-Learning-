@@ -80,9 +80,9 @@ docker-compose up --build
 
 ### 🕹️ How to use?
 
-Draw _walls_ (Wall tool █).
-Place _collectibles_ (◈) and an exit (⬡).
-Define the _start_ (◉).
-Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
+- Draw _walls_ (Wall tool █).
+- Place _collectibles_ (◈) and an exit (⬡).
+- Define the _start_ (◉).
+- Press `START`: Watch the AI explore (Exploration phase with Epsilon-Greedy) then optimize its path as cells turn green.
 
 _Project developed as part of a study on autonomous agents and reinforcement learning decision-making._
